@@ -24,6 +24,7 @@
     <div id="mapid"></div>
     <script>
 
+
         const mymap = L.map('mapid').setView([54.352024, 18.646639], 12);
         const marker = L.marker([54.352024, 18.646639]).addTo(mymap);
         const attribution =
@@ -39,25 +40,42 @@
                 const response = await fetch(api_url);
                 const vehicles = await response.json();
 
+
+
                 let result = vehicles["Vehicles"].filter(obj => {
                     return obj.Line === line
                 })
 
                 console.log(result)
 
-                const lat = vehicles["Vehicles"][line]["Lat"];
-                const lon = vehicles["Vehicles"][line]["Lon"];
 
-                marker.setLatLng([lat, lon]);
-                mymap.setView([lat, lon], 12)
+
+
+                result.foreach((element, i) => {
+                    setTimeout(
+                        function () {
+                            const lat = vehicles["Vehicles"][line]["Lat"];
+                            const lon = vehicles["Vehicles"][line]["Lon"];
+
+                            marker.setLatLng([lat, lon]);
+                            mymap.setView([lat, lon], 12)
+                            console.log(lat, lon)
+                        }, i * 3000);
+                });
+
+
+
             }
             const line = prompt('wybierz linie');
+            getISS();
             clearInterval(start);
-            start = setInterval(getISS, 1000);
+            start = setInterval(getISS, 25000);
 
         }
         const el = document.querySelector("button");
         el.addEventListener("click", chooseLine);
+
+
 
     </script>
 </body>
