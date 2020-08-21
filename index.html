@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -26,7 +27,8 @@
 
 
         const mymap = L.map('mapid').setView([54.352024, 18.646639], 12);
-        const marker = L.marker([54.352024, 18.646639]).addTo(mymap);
+        mymap.setView([54.352024, 18.646639], 12)
+
         const attribution =
             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
         const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -35,48 +37,31 @@
         const api_url = "https://ckan2.multimediagdansk.pl/gpsPositions?";
         let start;
         function chooseLine() {
+        async function move() {
+            clearMarkers(mymap);
+            const response = await fetch(api_url);
+            const vehicles = await response.json();
 
-            async function getISS() {
-                const response = await fetch(api_url);
-                const vehicles = await response.json();
-
-
-
-                let result = vehicles["Vehicles"].filter(obj => {
+            let result = vehicles["Vehicles"].filter(obj => {
                     return obj.Line === line
                 })
 
-                console.log(result)
+                console.log(result);
 
-
-
-
-                result.foreach((element, i) => {
-                    setTimeout(
-                        function () {
-                            const lat = vehicles["Vehicles"][line]["Lat"];
-                            const lon = vehicles["Vehicles"][line]["Lon"];
-
-                            marker.setLatLng([lat, lon]);
-                            mymap.setView([lat, lon], 12)
-                            console.log(lat, lon)
-                        }, i * 3000);
-                });
-
-
-
+            for (var vehicle of result) {
+                    L.marker([vehicle["Lat"], vehicle["Lon"]]).addTo(mymap).bindPopup(vehicle["VehicleCode"]);
+                
             }
-            const line = prompt('wybierz linie');
-            getISS();
-            clearInterval(start);
-            start = setInterval(getISS, 25000);
+        }
+        const line = prompt('wybierz linie');
+        clearInterval(start);
+        move();
+
+        start = setInterval(move, 25000);
 
         }
         const el = document.querySelector("button");
         el.addEventListener("click", chooseLine);
-
-
-
     </script>
 </body>
 
