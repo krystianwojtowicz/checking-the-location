@@ -26,60 +26,40 @@
 
 
         const mymap = L.map('mapid').setView([54.352024, 18.646639], 12); // tworzenie obiektu mapy, dwie pierwsze liczby to współrzędne, a trzecia to zoom
-        const marker = L.marker([54.352024, 18.646639]).addTo(mymap); // tworzenie markera - znacznika na mapie
+        mymap.setView([54.352024, 18.646639], 12)
+
         const attribution =
             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'; // atrybucja jest potrzebna do stworzenia mapy
-        const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'; // jak wiersz wyzej
-        const tiles = L.tileLayer(tileUrl, { attribution }); // tworzenie mapy
+        const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';// jak wiersz wyzej
+        const tiles = L.tileLayer(tileUrl, { attribution });// tworzenie mapy
         tiles.addTo(mymap);
         const api_url = "https://ckan2.multimediagdansk.pl/gpsPositions?";
         let start;
         function chooseLine() {
-
-            async function getISS() {
-                mymap.removeLayer(marker);
-
-
+            async function move() {
                 const response = await fetch(api_url);
                 const vehicles = await response.json();
 
-
-
-                let result = vehicles["Vehicles"].filter(obj => {  // tworzenie tablicy obiektów - pojazdów, które mają dany nr linii
+                let result = vehicles["Vehicles"].filter(obj => { // tworzenie tablicy obiektów - pojazdów, które mają dany nr linii
                     return obj.Line === line
                 })
 
-                console.log(result)
+                console.log(result);
 
+                for (var vehicle of result) {
+                    L.marker([vehicle["Lat"], vehicle["Lon"]]).addTo(mymap).bindPopup(vehicle["VehicleCode"]);  //tworzenie znacznikow dla result
 
-
-
-                result.foreach((element, i) => {
-                    setTimeout(
-                        function () {
-                            const lat = vehicles["Vehicles"][line]["Lat"];
-                            const lon = vehicles["Vehicles"][line]["Lon"];
-
-                            marker.setLatLng([lat, lon]); // zmiana współrzędnych markera
-                            mymap.setView([lat, lon], 12)  // zmiana widocznej czesci mapy
-                            console.log(lat, lon)
-                        }, i * 3000);
-                });
-
-
-
+                }
             }
             const line = prompt('wybierz linie');
-            getISS();
             clearInterval(start);
-            start = setInterval(getISS, 25000);
+            move();
+
+            start = setInterval(move, 25000);
 
         }
         const el = document.querySelector("button");
         el.addEventListener("click", chooseLine);
-
-
-
     </script>
 </body>
 
