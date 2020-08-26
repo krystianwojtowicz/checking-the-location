@@ -35,10 +35,25 @@
         tiles.addTo(mymap);
         const api_url = "https://ckan2.multimediagdansk.pl/gpsPositions?";
         let start;
+
+        // Tworzenie obiektu do zarządzania markerami
+        const markers = {
+            _markers: [], // Przechowuje dodane markery
+            save: function (marker) { // Funkcja dodaje nowy marker do tablicy
+                this._markers.push(marker);
+            },
+            clear: function () { // Funkcja mapuje istniejące markery i usuwa każdy z mapy
+                this._markers.map(marker => mymap.removeLayer(marker));
+                this._markers = []; // Czyścimy tablicę markerów
+            }
+        }
+
         function chooseLine() {
             async function move() {
                 const response = await fetch(api_url);
                 const vehicles = await response.json();
+
+                markers.clear(); // Przed dodaniem nowych markerów na mapie, usuwamy już istniejące
 
                 let result = vehicles["Vehicles"].filter(obj => { // tworzenie tablicy obiektów - pojazdów, które mają dany nr linii
                     return obj.Line === line
@@ -47,8 +62,8 @@
                 console.log(result);
 
                 for (var vehicle of result) {
-                    L.marker([vehicle["Lat"], vehicle["Lon"]]).addTo(mymap).bindPopup(vehicle["VehicleCode"]);  //tworzenie znacznikow dla result
-
+                    const marker = L.marker([vehicle["Lat"], vehicle["Lon"]]).addTo(mymap).bindPopup(vehicle["VehicleCode"]);  // Tworzymy nowy marker i przypisujemy go do zmiennej
+                    markers.save(marker); // Zapisujemy nowo dodany marker do tablicy
                 }
             }
             const line = prompt('wybierz linie');
