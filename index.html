@@ -30,15 +30,29 @@
     </p>
     <div id="mapid"></div>
     <script>
-        const lines = [112, 149, 169, 8, 118, 148, 268, 249, 607, 126, 132, 108, 175, 12, 210, 199, 130, 127, 295, 189, 154, 186, 122, 184, 107, 123, 179, 4, 255, 168, 166, 136, 10, 213, 207, 120, 3, 9, 2, 110, 171, 167, 113, 131, 162, 5, 256, 205, 195, 178, 143, 155, 111, 117, 158, 6, 267, 174, 7, 115, 200, 124, 116, 227, 283, 156, 157, 262, 269, 622, 658, 232, 106, 320, 606, 138, 512];
-        function button() {
-            for (var i = 0; i < lines.length; i++) {
-                document.getElementById("possibilities").innerHTML += "<button>" + lines[i] + "</button>";
-            }
+        const bussesNumberLine = [
+            112, 149, 169, 8, 118, 148, 268, 249, 607, 126, 132, 
+            108, 175, 12, 210, 199, 130, 127, 295, 189, 154, 186, 
+            122, 184, 107, 123, 179, 4, 255, 168, 166, 136, 10, 213,
+             207, 120, 3, 9, 2, 110, 171, 167, 113, 131, 162, 5, 256, 
+             205, 195, 178, 143, 155, 111, 117, 158, 6, 267, 174, 7, 115, 
+             200, 124, 116, 227, 283, 156, 157, 262, 269, 622, 658, 232, 106, 
+             320, 606, 138, 512];
+        
+
+        const button = () => {
+            bussesNumberLine.map(line => {
+               let result = document.getElementById("possibilities").innerHTML += `<button class="__line__btn__"> ${line} </button>`;
+                return result;
+            })
         }
-        button();
+         button();
 
+         const lineBtn = Array.from(document.querySelectorAll(".__line__btn__"));
 
+           
+
+    
         const mymap = L.map('mapid').setView([54.352024, 18.646639], 12); // tworzenie obiektu mapy, dwie pierwsze liczby to współrzędne, a trzecia to zoom
         mymap.setView([54.352024, 18.646639], 12)
 
@@ -68,27 +82,26 @@
                 const vehicles = await response.json();
 
 
-
-
-                // let results = vehicles["Vehicles"].map(a => a.Line);
-                // let unique = [...new Set(results)];
-                // document.getElementById("possibilities").innerHTML = unique;
-
-
                 markers.clear(); // Przed dodaniem nowych markerów na mapie, usuwamy już istniejące
 
-                let result = vehicles["Vehicles"].filter(obj => { // tworzenie tablicy obiektów - pojazdów, które mają dany nr linii
-                    return obj.Line === line
+                const result = lineBtn.map(item => {
+                  item.addEventListener("click" , e => {
+                  return e.target.innerText;
+               })
+              })
+
+                const result  = Object.values(vehicles).filter(item => {
+                  return item.Line === res
                 })
 
-                console.log(result);
-
+                console.log(result)
+         
                 for (var vehicle of result) {
                     const marker = L.marker([vehicle["Lat"], vehicle["Lon"]]).addTo(mymap).bindPopup(vehicle["VehicleCode"]);  // Tworzymy nowy marker i przypisujemy go do zmiennej
                     markers.save(marker); // Zapisujemy nowo dodany marker do tablicy
                 }
             }
-            const line = prompt('wybierz linie');
+            // const line = prompt('wybierz linie');
             clearInterval(start);
             move();
 
