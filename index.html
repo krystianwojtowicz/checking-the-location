@@ -172,13 +172,6 @@
               .bindPopup(item.VehicleCode); // Tworzymy nowy marker i przypisujemy go do zmiennej
             markers.save(marker);
           });
-
-          for (var vehicle of result) {
-            const marker = L.marker([vehicle["Lat"], vehicle["Lon"]])
-              .addTo(mymap)
-              .bindPopup(vehicle["VehicleCode"]); // Tworzymy nowy marker i przypisujemy go do zmiennej
-            markers.save(marker); // Zapisujemy nowo dodany marker do tablicy
-          }
         }
         // const line = prompt('wybierz linie');
         clearInterval(start);
