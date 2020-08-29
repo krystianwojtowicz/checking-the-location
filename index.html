@@ -124,12 +124,6 @@
 
       const lineBtn = Array.from(document.querySelectorAll(".__line__btn__"));
 
-      const res = lineBtn.map((item) => {
-        item.addEventListener("click", (e) => {
-          return e.target.innerText;
-        });
-      });
-
       const mymap = L.map("mapid").setView([54.352024, 18.646639], 12); // tworzenie obiektu mapy, dwie pierwsze liczby to współrzędne, a trzecia to zoom
       mymap.setView([54.352024, 18.646639], 12);
 
@@ -155,7 +149,13 @@
         },
       };
 
-      function chooseLine() {
+      const res = lineBtn.map((item) => {
+        item.addEventListener("click", (e) => {
+          return chooseLine(e.target.innerText);
+        });
+      });
+
+      function chooseLine(innerText) {
         async function move() {
           const response = await fetch(api_url);
           const vehicles = await response.json();
@@ -167,11 +167,17 @@
           });
 
           const result = list[1].map((item) => {
-            const marker = L.marker([item.Lat, item.Lon])
-              .addTo(mymap)
-              .bindPopup(item.VehicleCode); // Tworzymy nowy marker i przypisujemy go do zmiennej
-            markers.save(marker);
+            if (item.Line === innerText) {
+              const marker = L.marker([item.Lat, item.Lon])
+                .addTo(mymap)
+                .bindPopup(item.VehicleCode); // Tworzymy nowy marker i przypisujemy go do zmiennej
+              markers.save(marker);
+            } else {
+              console.log("=====No Line!!!======");
+            }
           });
+
+          console.log(list);
         }
         // const line = prompt('wybierz linie');
         clearInterval(start);
@@ -179,8 +185,6 @@
 
         start = setInterval(move, 25000);
       }
-      const el = document.querySelector("p");
-      el.addEventListener("click", chooseLine);
     </script>
   </body>
 </html>
